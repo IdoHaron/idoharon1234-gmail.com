@@ -43,19 +43,33 @@ print_num proc
 print_num endp
 
 print_result proc
-	cmp isNeg_result, 1
+	cmp result, 65535
+	jc start_print_res
+	print inf
+	jmp end_printResult
+start_print_res:	cmp isNeg_result, 1
 	jnz number_printing
 	print_char "-"
 number_printing:	call power_10
 	divider result, bx
 	cmp bx, 1
-	jnz not_full_num
-	print_char "1"
-	jmp end_printResult
+	jc not_full_num_0
+	push bx
+	push bx ;; fixing the function for sin. we will divede by the power of 10, and then we will multiplye
+	call print_num
+	pop bx
+	mov cx, bx
+	call power_10
+	mult cx, bx ; get the full part of the resutlt and then sub it for the result.
+	sub result, cx
+	jz end_printResult
 	not_full_num:
-		print not_full_numM
+		print_char "."
 		push result
 		call print_num
+	not_full_num_0:
+		print_char "0"
+		jmp not_full_num
 end_printResult:
 	ret
 print_result endp

@@ -148,7 +148,7 @@ fiting_pi_calc proc
 	pop bx
 fiting_pi_calc endp
 
-larger_than_pi proc
+larger_than_pi proc ; check that it is not seppoused to also substruct the full value from the sign
 	mov ax, angel
 	mov cx,cx
 	mov ax, ax

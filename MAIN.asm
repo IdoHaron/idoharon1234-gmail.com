@@ -17,11 +17,24 @@
 	massage1 db "choose function (s= sin, c= cos, t=tan): $"
 	massage2 db "enter rad angel, divided by pi: pi$"
 	massage3 db "result:$"
-	not_full_numM db "0.$"
+	;not_full_numM db "0.$"
+	inf db "infinity$"
 dseg ends
 cseg segment 
 assume cs:cseg, ds: dseg
+safe_calling macro lab
+	push ax
+	push bx
+	push cx
+	push dx
+	call lab
+	pop dx
+	pop cx
+	pop bx
+	pop ax
+endm
 include mathop.asm
+include Math32.asm
 include print.asm
 include input.asm
 include trigoFnc.asm
@@ -36,7 +49,7 @@ include trigoFnc.asm
 		call enter_notFullPos
 		call fixPivot
 		call angel_manager
-		call larger_than_pi ;; here it gets stack
+		call larger_than_pi 
 		cmp trigo_func,  "s"
 		jnz cos_tan
 		call sin
@@ -49,7 +62,9 @@ include trigoFnc.asm
 			sign_check8b Larger_Than_1_cos
 			jmp resultMain
 			tanMAIN: call tan ;tan is exactly the same in the ranges [0-1,1-2] pi
-	resultMain:	print massage3
+	resultMain:
+		mov ax, result
+		print massage3
 		call print_result
 		call enter_char
 		int 3h
