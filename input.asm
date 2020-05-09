@@ -35,7 +35,10 @@ enter_notFullPos proc
 						jmp num_enter
 	end_input:
 		mov angel, bx
+		cmp cl, 0
+		jz not_dec_input
 		dec cl
+		not_dec_input:
 		mov pivot, cl
 		cmp ch, cl
 		jc pivot_largerThanNumCount

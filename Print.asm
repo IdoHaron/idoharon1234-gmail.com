@@ -16,7 +16,7 @@ downLine endp
 
 print_num proc
 	pop dx
-	pop bx
+	pop bx ;; input
 	push dx
 	mov ax, bx
 	mov cl, 0
@@ -42,34 +42,52 @@ print_num proc
 		ret
 print_num endp
 
-print_result proc
-	cmp result, 65535
-	jc start_print_res
-	print inf
+print_result proc ;; works;
+zero_check_print:
+	cmp result, 0
+	jnz start_print_res
+	print_char "0"
 	jmp end_printResult
-start_print_res:	cmp isNeg_result, 1
-	jnz number_printing
+start_print_res:
+	cmp isNeg_result, 1
+	jnz is_inf
 	print_char "-"
+is_inf:	cmp result, 65535
+	jc number_printing
+	print inf 
+	jmp end_printResult
 number_printing:	call power_10
 	divider result, bx
-	cmp bx, 1
+	cmp ax, 1
+	jz print_fullPart
 	jc not_full_num_0
-	push bx
-	push bx ;; fixing the function for sin. we will divede by the power of 10, and then we will multiplye
+print_fullPart:	push ax ;; saves the value,. for print_num not to change.
+	push ax ;; fixing the function for sin. we will divede by the power of 10, and then we will multiplye
 	call print_num
-	pop bx
-	mov cx, bx
+	pop ax
 	call power_10
+	mov cx, ax
 	mult cx, bx ; get the full part of the resutlt and then sub it for the result.
 	sub result, cx
 	jz end_printResult
 	not_full_num:
-		print_char "."
+		print_char "." ;; starts change
+		call power_10
+	zero_print:	divider bx, 10
+		mov cx, ax
+		mov bx, ax
+		divider result, cx
+		cmp ax, 0
+		jnz not_full_num_fin
+		print_char "0"
+		jmp zero_print
+		not_full_num_fin: ;; end change
 		push result
 		call print_num
+		ret
 	not_full_num_0:
 		print_char "0"
-		jmp not_full_num
+		jmp not_full_num 
 end_printResult:
 	ret
 print_result endp
